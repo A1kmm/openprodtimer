@@ -1,4 +1,4 @@
-module Paths_hsprodtimer
+module Paths_openprodtimer
 where
   
 import System.FilePath
