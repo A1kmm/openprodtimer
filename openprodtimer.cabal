@@ -1,0 +1,63 @@
+Name:                 openprodtimer
+Version:              0.0.1
+Cabal-Version:        >= 1.6
+Build-Type:           Simple
+Copyright:            Andrew Miller
+Author:               Andrew Miller
+Maintainer:           Andrew Miller <andrew@amxl.com>
+Stability:            experimental
+Synopsis:             A productivity timer, written in Haskell
+Description:          A productivity timer that has three states: work, short break, and long break, with task bar support.
+
+Extra-Source-Files:
+  icon-sources/work-time.svg,
+  icon-sources/short-break.svg,
+  icon-sources/long-break.svg
+
+Data-Files:
+    icons/work-time.png,
+    icons/short-break.png,
+    icons/long-break.png,
+    sounds/WorkTime.wav,
+    sounds/ShortBreak.wav,
+    sounds/LongBreak.wav
+
+Flag Static
+     Description: Link statically
+     Default: True
+
+Executable prodtimer
+  hs-source-dirs: src
+  main-is: Main.hs
+  c-sources: src/syncplay.c
+  ghc-options: -O2
+  -- Note: dynamic Windows build is threaded, but
+  -- we use a hack to do it, rather than -threaded
+  -- See http://hackage.haskell.org/trac/ghc/ticket/5620
+  if !os(windows) || flag(Static)
+     ghc-options: -threaded
+  if flag(Static)
+    ghc-options: -static
+  else
+    ghc-options: -dynamic -fPIC
+  if os(windows)
+    ghc-options: -optl-mwindows
+    extra-libraries: winmm
+  else
+    extra-libraries: canberra glib-2.0 gthread-2.0
+    include-dirs: /usr/include/glib-2.0
+  ghc-prof-options: -rtsopts -auto-all -caf-all
+  cc-options: -fPIC
+  build-depends: base == 4.*,
+                 gtk >= 0.12 && < 0.13,
+                 containers >= 0.3 && <= 0.6,
+                 time < 2,
+                 transformers,
+                 monads-tf,
+                 directory >= 1 && <2,
+                 parsec >= 3 && < 3.2,
+                 filepath >= 1.2 && < 1.4,
+                 old-locale >= 1 && < 1.1,
+                 bytestring
+  if !os(windows)
+    build-depends: gconf, happindicator
